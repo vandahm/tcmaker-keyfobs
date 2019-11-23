@@ -139,12 +139,7 @@ function keyfobs_civicrm_angularModules(&$angularModules) {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_alterSettingsFolders
  */
 function keyfobs_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
-  $settingsDir = __DIR__ . DIRECTORY_SEPARATOR . 'settings';
-  // var_dump($settingsDir);
-  // if (!in_array($settingsDir, $metaDataFolders) && is_dir($settingsDir)) {
-  //   $metaDataFolders[] = $settingsDir;
-  // }
-  $metaDataFolders[] = $settingsDir;
+  _keyfobs_civix_civicrm_alterSettingsFolders($metaDataFolders);
 }
 
 /**

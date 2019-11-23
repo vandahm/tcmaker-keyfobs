@@ -44,7 +44,7 @@ class CRM_Keyfobs_BAO_Keyfob extends CRM_Keyfobs_DAO_Keyfob {
 
     $is_active = false;
     foreach ($result['values'] as $value) {
-      if in_array($value['status_id'], $status_ids) {
+      if (in_array($value['status_id'], $status_ids)) {
         $is_active = true;
         break;
       }
@@ -65,13 +65,13 @@ class CRM_Keyfobs_BAO_Keyfob extends CRM_Keyfobs_DAO_Keyfob {
 
     $message = json_encode($message);
 
-    $client = new SqsClient::factory(
+    $client = SqsClient::factory(array(
         'credentials' => array(
           'key' => Civi::settings()->get('keyfobs_aws_access_key_id'),
           'secret' => Civi::settings()->get('keyfobs_aws_secret_access_key'),
         ),
         'region'  => Civi::settings()->get('keyfobs_aws_region'),
-    );
+    ));
 
     $client->sendMessage(array(
       'QueueUrl' => Civi::settings()->get('keyfobs_aws_sqs_queue_url'),
@@ -80,9 +80,9 @@ class CRM_Keyfobs_BAO_Keyfob extends CRM_Keyfobs_DAO_Keyfob {
   }
 
 
-  public function save()
+  public function save($hook=True)
   {
-    $ret = parent::save();
+    $ret = parent::save($hook);
     $this->update_sqs();
     return $ret;
   }
