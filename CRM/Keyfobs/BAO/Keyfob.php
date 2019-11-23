@@ -96,6 +96,8 @@ class CRM_Keyfobs_BAO_Keyfob extends CRM_Keyfobs_DAO_Keyfob {
     $this->getSqsClient()->sendMessage(array(
       'QueueUrl' => Civi::settings()->get('keyfobs_aws_sqs_queue_url'),
       'MessageBody' => json_encode($message),
+      'MessageGroupId' => 'DoorMessages',
+      'MessageDepublicationId' => uniqid($more_entropy=true),
     ));
   }
 
@@ -115,6 +117,8 @@ class CRM_Keyfobs_BAO_Keyfob extends CRM_Keyfobs_DAO_Keyfob {
     $this->getSqsClient()->sendMessage(array(
       'QueueUrl' => Civi::settings()->get('keyfobs_aws_sqs_queue_url'),
       'MessageBody' => json_encode($message),
+      'MessageGroupId' => 'DoorMessages',
+      'MessageDeduplicationId' => uniqid($more_entropy=true),
     ));
   }
 
