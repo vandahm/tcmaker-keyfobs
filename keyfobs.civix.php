@@ -461,7 +461,6 @@ function _keyfobs_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
   if (!in_array($settingsDir, $metaDataFolders) && is_dir($settingsDir)) {
     $metaDataFolders[] = $settingsDir;
   }
-  var_dump($metaDataFolders);
 }
 
 /**
@@ -474,7 +473,7 @@ function _keyfobs_civix_civicrm_alterSettingsFolders(&$metaDataFolders = NULL) {
 
 function _keyfobs_civix_civicrm_entityTypes(&$entityTypes) {
   $entityTypes = array_merge($entityTypes, array (
-    'CRM_Keyfobs_DAO_Keyfob' =>
+    'CRM_Keyfobs_DAO_Keyfob' => 
     array (
       'name' => 'Keyfob',
       'class' => 'CRM_Keyfobs_DAO_Keyfob',

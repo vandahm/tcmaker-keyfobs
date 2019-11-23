@@ -34,6 +34,7 @@
     <type>varchar</type>
     <name>code</name>
     <required>true</required>
+    <length>100</length>
     <comment>the code embedded in the RFID keyfob</comment>
   </field>
   <index>

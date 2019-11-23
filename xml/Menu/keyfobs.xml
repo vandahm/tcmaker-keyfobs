@@ -8,6 +8,13 @@
   </item>
 
   <item>
+    <path>civicrm/contact/keyfob</path>
+    <page_callback>CRM_Keyfobs_Form_Keyfob</page_callback>
+    <title>Keyfob</title>
+    <access_arguments>access CiviCRM</access_arguments>
+  </item>
+
+  <item>
     <path>civicrm/admin/setting/keyfobs</path>
     <title>Keyfob SQS Settings</title>
     <page_callback>CRM_Admin_Form_Generic</page_callback>

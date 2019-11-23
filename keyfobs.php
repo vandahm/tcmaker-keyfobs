@@ -1,11 +1,12 @@
 <?php
 
+require_once 'CRM/Keyfobs/Upgrader/Base.php';
+require_once 'CRM/Keyfobs/Upgrader.php';
 require_once 'keyfobs.civix.php';
-require_once 'vendor/autoload.php';
+require_once __DIR__ . '/vendor/autoload.php';
+
+
 use CRM_Keyfobs_ExtensionUtil as E;
-
-
-
 
 function keyfobs_civicrm_tabs(&$tabs, $contactID) {
   $session = CRM_Core_Session::singleton();
@@ -73,6 +74,8 @@ function keyfobs_civicrm_uninstall() {
  * @link https://docs.civicrm.org/dev/en/latest/hooks/hook_civicrm_enable
  */
 function keyfobs_civicrm_enable() {
+  $upgrader = CRM_Keyfobs_Upgrader::instance();
+  $upgrader->onInstall();
   _keyfobs_civix_civicrm_enable();
 }
 
@@ -159,6 +162,20 @@ function keyfobs_civicrm_entityTypes(&$entityTypes) {
 function keyfobs_civicrm_themes(&$themes) {
   _keyfobs_civix_civicrm_themes($themes);
 }
+
+function keyfobs_alterCalculatedMembershipStatus(&$membershipStatus, $arguments, $membership) {
+  var_dump($membership);
+}
+
+function keyfobs_civicrm_post($op, $objectName, $objectId, &$objectRef) {
+  if ($objectName == 'Membership') {
+    $membership = $objectRef;
+    $keyfob = new CRM_Keyfobs_BAO_Keyfob();
+    $keyfob->get('contact_id', $membership->contact_id);
+    $keyfob->update_sqs();
+  }
+}
+
 
 // --- Functions below this ship commented out. Uncomment as required. ---
 

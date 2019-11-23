@@ -51,13 +51,11 @@ CREATE TABLE `civicrm_keyfob` (
 
      `id` int unsigned NOT NULL AUTO_INCREMENT  COMMENT 'Unique Keyfob ID',
      `contact_id` int unsigned    COMMENT 'FK to Contact',
-     `code` varchar(0) NOT NULL   COMMENT 'the code embedded in the RFID keyfob',
-     `access_level` int unsigned   DEFAULT 1 COMMENT 'The access level.' 
+     `code` varchar(100) NOT NULL   COMMENT 'the code embedded in the RFID keyfob',
+     `access_level` int unsigned   DEFAULT 1 COMMENT 'The access level.'
 ,
         PRIMARY KEY (`id`)
- 
- 
-,          CONSTRAINT FK_civicrm_keyfob_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE  
-)    ;
 
- 
+
+,          CONSTRAINT FK_civicrm_keyfob_contact_id FOREIGN KEY (`contact_id`) REFERENCES `civicrm_contact`(`id`) ON DELETE CASCADE
+)    ;

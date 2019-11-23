@@ -1,7 +1,6 @@
 <?php
 use CRM_Keyfobs_ExtensionUtil as E;
-use Aws\S3\SqsClient;
-use Aws\Common\Credentials\Credentials;
+use Aws\Sqs\SqsClient;
 
 class CRM_Keyfobs_BAO_Keyfob extends CRM_Keyfobs_DAO_Keyfob {
 
@@ -10,9 +9,9 @@ class CRM_Keyfobs_BAO_Keyfob extends CRM_Keyfobs_DAO_Keyfob {
    *
    * @param array $params key-value pairs
    * @return CRM_Keyfobs_DAO_Keyfob|NULL
-   *
+   */
   public static function create($params) {
-    $className = 'CRM_Keyfobs_DAO_Keyfob';
+    $className = 'CRM_Keyfobs_BAO_Keyfob';
     $entityName = 'Keyfob';
     $hook = empty($params['id']) ? 'create' : 'edit';
 
@@ -20,13 +19,17 @@ class CRM_Keyfobs_BAO_Keyfob extends CRM_Keyfobs_DAO_Keyfob {
     $instance = new $className();
     $instance->copyValues($params);
     $instance->save();
+    $instance->update_sqs();
     CRM_Utils_Hook::post($hook, $entityName, $instance->id, $instance);
 
     return $instance;
-  } */
+  }
 
-  public function update_sqs($contact_id)
+  public function update_sqs()
   {
+    if (is_null($this->code)) {
+      return;
+    }
     $contact_id = $this->contact_id;
 
     $status_results = civicrm_api3('MembershipStatus', 'getlist');
@@ -39,7 +42,7 @@ class CRM_Keyfobs_BAO_Keyfob extends CRM_Keyfobs_DAO_Keyfob {
 
     $result = civicrm_api3('Membership', 'get', [
       'sequential' => 1,
-      'contact_id' => 204,
+      'contact_id' => $contact_id,
     ]);
 
     $is_active = false;
@@ -50,38 +53,92 @@ class CRM_Keyfobs_BAO_Keyfob extends CRM_Keyfobs_DAO_Keyfob {
       }
     }
 
-    $message = array(
-      'action' => 'deactivate',
-      'code' => $this->code,
-      'member' => $this->contact_id,
-      'access_level' => 0,
-    );
-
     if ($is_active) {
-      $message['action'] = 'activate';
-      $message['access_level'] = $this->access_level;
+      $this->activate();
+    } else {
+      $this->deactivate();
+    }
+
+    // $message = array(
+    //   'action' => 'deactivate',
+    //   'code' => $this->code,
+    //   'member' => $this->contact_id,
+    //   'access_level' => 0,
+    // );
+    //
+    // if ($is_active) {
+    //   $message['action'] = 'activate';
+    //   $message['access_level'] = $this->access_level;
+    // }
+    //
+    // $message = json_encode($message);
+    //
+    // $client = $this->getSqsClient();
+    // $client->sendMessage(array(
+    //   'QueueUrl' => Civi::settings()->get('keyfobs_aws_sqs_queue_url'),
+    //   'MessageBody' => $message,
+    // ));
+  }
+
+  public function deactivate() {
+    // You can't deactivate a code that doesn't exist
+    if (! $this->code) {
       return;
     }
 
-    $message = json_encode($message);
+    $message = array(
+      'action' => 'deactivate',
+      'code' => $this->code,
+      'member' => (int)$this->contact_id,
+      'access_level' => 0,
+    );
 
-    $client = SqsClient::factory(array(
+    $this->getSqsClient()->sendMessage(array(
+      'QueueUrl' => Civi::settings()->get('keyfobs_aws_sqs_queue_url'),
+      'MessageBody' => json_encode($message),
+    ));
+  }
+
+  public function activate() {
+    // Don't activate unless a code is present.
+    if (! $this->code) {
+      return;
+    }
+
+    $message = array(
+      'action' => 'activate',
+      'code' => $this->code,
+      'member' => (int)$this->contact_id,
+      'access_level' => (int)$this->access_level,
+    );
+
+    $this->getSqsClient()->sendMessage(array(
+      'QueueUrl' => Civi::settings()->get('keyfobs_aws_sqs_queue_url'),
+      'MessageBody' => json_encode($message),
+    ));
+  }
+
+  protected function getSqsClient() {
+    return SqsClient::factory(array(
         'credentials' => array(
           'key' => Civi::settings()->get('keyfobs_aws_access_key_id'),
           'secret' => Civi::settings()->get('keyfobs_aws_secret_access_key'),
         ),
         'region'  => Civi::settings()->get('keyfobs_aws_region'),
-    ));
-
-    $client->sendMessage(array(
-      'QueueUrl' => Civi::settings()->get('keyfobs_aws_sqs_queue_url'),
-      'MessageBody' => $message,
+        'version' => 'latest',
     ));
   }
 
-
   public function save($hook=True)
   {
+    $oldValues = new CRM_Keyfobs_BAO_Keyfob();
+    $oldValues->get('id', $this->id);
+
+    if ($oldValues->code && ($oldValues->code != $this->code)) {
+      // If we're changing a code, deactivate the old code first
+      $oldValues->deactivate();
+    }
+
     $ret = parent::save($hook);
     $this->update_sqs();
     return $ret;
