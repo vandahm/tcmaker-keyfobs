@@ -2,27 +2,28 @@
 
 ![Screenshot](/images/screenshot.png)
 
-(*FIXME: In one or two paragraphs, describe what the extension does and why one would download it. *)
-
-The extension is licensed under [AGPL-3.0](LICENSE.txt).
+You definitely don't want to download this.
 
 ## Requirements
 
 * PHP v7.0+
-* CiviCRM (*FIXME: Version number*)
+* CiviCRM 5.19 or greater
 
 ## Installation (Web UI)
 
-This extension has not yet been published for installation via the web UI.
+You will never be able to install this from the web UI. Just deal with it.
 
 ## Installation (CLI, Zip)
 
-Sysadmins and developers may download the `.zip` file for this extension and
-install it with the command-line tool [cv](https://github.com/civicrm/cv).
+[https://github.com/vandahm/tcmaker-keyfobs/releases/](https://github.com/vandahm/tcmaker-keyfobs/releases/)
+
+To make your own ZIP file:
 
 ```bash
-cd <extension-dir>
-cv dl keyfobs@https://github.com/FIXME/keyfobs/archive/master.zip
+git clone https://github.com/vandahm/tcmaker-keyfobs.git
+cd tcmaker-keyfobs
+composer Install
+zip -r keyfobs.zip . -x '.git/*'
 ```
 
 ## Installation (CLI, Git)
@@ -31,14 +32,16 @@ Sysadmins and developers may clone the [Git](https://en.wikipedia.org/wiki/Git) 
 install it with the command-line tool [cv](https://github.com/civicrm/cv).
 
 ```bash
-git clone https://github.com/FIXME/keyfobs.git
+git clone https://github.com/vandahm/tcmaker-keyfobs.git
+cd tcmaker-keyfobs
+composer install
 cv en keyfobs
 ```
 
 ## Usage
 
-(* FIXME: Where would a new user navigate to get started? What changes would they see? *)
+Be sure to set your AWS credentials in System Settings.
 
 ## Known Issues
 
-(* FIXME *)
+There's all kinds of stuff wrong with this extension.
