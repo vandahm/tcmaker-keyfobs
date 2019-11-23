@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="iso-8859-1" ?>
+
+<table>
+  <base>CRM/Keyfobs</base>
+  <class>Keyfob</class>
+  <name>civicrm_keyfob</name>
+  <comment>Table for storing member keyfobs</comment>
+  <log>true</log>
+
+  <field>
+    <name>id</name>
+    <type>int unsigned</type>
+    <required>true</required>
+    <comment>Unique Keyfob ID</comment>
+  </field>
+  <primaryKey>
+    <name>id</name>
+    <autoincrement>true</autoincrement>
+  </primaryKey>
+
+  <field>
+    <name>contact_id</name>
+    <type>int unsigned</type>
+    <comment>FK to Contact</comment>
+  </field>
+  <foreignKey>
+    <name>contact_id</name>
+    <table>civicrm_contact</table>
+    <key>id</key>
+    <onDelete>CASCADE</onDelete>
+  </foreignKey>
+
+  <field>
+    <type>varchar</type>
+    <name>code</name>
+    <required>true</required>
+    <comment>the code embedded in the RFID keyfob</comment>
+  </field>
+  <index>
+    <name>index_code</name>
+    <unique>true</unique>
+  </index>
+
+  <field>
+    <type>int unsigned</type>
+    <name>access_level</name>
+    <default>1</default>
+    <comment>The access level.</comment>
+  </field>
+</table>
